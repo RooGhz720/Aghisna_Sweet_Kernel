@@ -628,3 +628,4 @@ void qg_soc_exit(struct qpnp_qg *chip)
 {
 	alarm_cancel(&chip->alarm_timer);
 }
+

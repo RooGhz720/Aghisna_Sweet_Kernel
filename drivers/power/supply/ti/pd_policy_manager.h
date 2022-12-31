@@ -270,3 +270,4 @@ extern struct usbpd *smb_get_usbpd(void);
 
 
 #endif /* SRC_PDLIB_USB_PD_POLICY_MANAGER_H_ */
+

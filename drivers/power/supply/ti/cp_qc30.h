@@ -262,3 +262,4 @@ struct sys_config {
 };
 
 #endif /* SRC_PDLIB_USB_PD_POLICY_MANAGER_H_ */
+

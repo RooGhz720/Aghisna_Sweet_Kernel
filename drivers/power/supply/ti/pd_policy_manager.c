@@ -257,6 +257,79 @@ static bool pd_get_bms_digest_verified(struct usbpd_pm *pdpm)
 		return false;
 }
 
+/* get pd pps charger verified result  */
+#if 0
+static bool pd_get_pps_charger_verified(struct usbpd_pm *pdpm)
+{
+	union power_supply_propval pval = {0,};
+	int rc;
+
+	if (!pdpm->usb_psy)
+		return false;
+
+	rc = power_supply_get_property(pdpm->usb_psy,
+				POWER_SUPPLY_PROP_PD_AUTHENTICATION, &pval);
+	if (rc < 0) {
+		pr_info("Couldn't get pd_authentication result:%d\n", rc);
+		return false;
+	}
+
+	pr_err("pval.intval: %d\n", pval.intval);
+
+	if (pval.intval == 1)
+		return true;
+	else
+		return false;
+}
+#endif
+
+
+/* get bq27z561 fastcharge mode to enable or disabled */
+/*
+static int pd_get_bms_charge_current_max(struct usbpd_pm *pdpm, int *fcc_ua)
+{
+	union power_supply_propval pval = {0,};
+	int rc = 0;
+
+	if (!pdpm->bms_psy)
+		return rc;
+
+	rc = power_supply_get_property(pdpm->bms_psy,
+				POWER_SUPPLY_PROP_CURRENT_MAX, &pval);
+	if (rc < 0) {
+		pr_info("Couldn't get current max:%d\n", rc);
+		return rc;
+	}
+
+	*fcc_ua = pval.intval;
+	return rc;
+
+}
+*/
+/*
+static int usbpd_set_new_fcc_voter(struct usbpd_pm *pdpm)
+{
+	int rc = 0;
+	int fcc_ua = 0;
+
+	rc = pd_get_bms_charge_current_max(pdpm, &fcc_ua);
+
+	if (rc < 0)
+		return rc;
+
+	if (!pdpm->fcc_votable)
+		pdpm->fcc_votable = find_votable("FCC");
+
+	if (!pdpm->fcc_votable)
+		return -EINVAL;
+
+	if (pdpm->fcc_votable)
+		vote(pdpm->fcc_votable, STEP_BMS_CHG_VOTER, true, fcc_ua);
+
+	return rc;
+}
+*/
+
 static void usbpd_check_cp_psy(struct usbpd_pm *pdpm)
 {
 	if (!pdpm->cp_psy) {
@@ -1238,6 +1311,12 @@ static int usbpd_pm_sm(struct usbpd_pm *pdpm)
 		break;
 
 	case PD_PM_STATE_FC2_TUNE:
+#if 0
+		if (pdpm->cp.vbat_volt < pm_config.min_vbat_for_cp - 400) {
+			usbpd_pm_move_state(PD_PM_STATE_SW_ENTRY);
+			break;
+		}
+#endif
 		usbpd_update_pps_status(pdpm);
 
 		ret = usbpd_pm_fc2_charge_algo(pdpm);
@@ -1408,6 +1487,21 @@ static void cp_psy_change_work(struct work_struct *work)
 {
 	struct usbpd_pm *pdpm = container_of(work, struct usbpd_pm,
 					cp_psy_change_work);
+#if 0
+	union power_supply_propval val = {0,};
+	bool ac_pres = pdpm->cp.vbus_pres;
+	int ret;
+
+	if (!pdpm->cp_psy)
+		return;
+
+	ret = power_supply_get_property(pdpm->cp_psy, POWER_SUPPLY_PROP_TI_VBUS_PRESENT, &val);
+	if (!ret)
+		pdpm->cp.vbus_pres = val.intval;
+
+	if (!ac_pres && pdpm->cp.vbus_pres)
+		schedule_delayed_work(&pdpm->pm_work, 0);
+#endif
 	pdpm->psy_change_running = false;
 }
 
@@ -1633,4 +1727,5 @@ module_exit(usbpd_pm_exit);
 MODULE_AUTHOR("Fei Jiang<jiangfei1@xiaomi.com>");
 MODULE_DESCRIPTION("Xiaomi usb pd statemachine for bq");
 MODULE_LICENSE("GPL");
+
 

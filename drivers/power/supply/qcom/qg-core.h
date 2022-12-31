@@ -343,3 +343,4 @@ enum batt_temp_comp {
 	NTC_HIGH_COMP = 6,
 };
 #endif /* __QG_CORE_H__ */
+

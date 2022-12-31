@@ -38,6 +38,7 @@
 #include <asm/neon.h>
 
 #include "bq25970_reg.h"
+/*#include "bq2597x.h"*/
 
 #include <soc/qcom/socinfo.h>
 
@@ -1629,6 +1630,12 @@ static int bq2597x_parse_dt(struct bq2597x *bq, struct device *dev)
 		bq_err("failed to read bus-ocp-alarm-threshold\n");
 		return ret;
 	}
+	/*ret = of_property_read_u32(np, "ti,bq2597x,bat-ucp-alarm-threshold",
+			&bq->cfg->bat_ucp_alm_th);
+	if (ret) {
+		bq_err("failed to read bat-ucp-alarm-threshold\n");
+		return ret;
+	}*/
 	ret = of_property_read_u32(np, "ti,bq2597x,bat-therm-threshold",
 			&bq->cfg->bat_therm_th);
 	if (ret) {
@@ -1794,6 +1801,8 @@ static int bq2597x_init_protection(struct bq2597x *bq)
 
 static int bq2597x_set_bus_protection(struct bq2597x *bq, int hvdcp3_type)
 {
+	/* just return now, to do later */
+	//return 0;
 
 	pr_err("hvdcp3_type: %d\n", hvdcp3_type);
 	if (hvdcp3_type == HVDCP3_CLASSA_18W) {
@@ -1862,12 +1871,14 @@ static int bq2597x_init_int_src(struct bq2597x *bq)
 		bq_err("failed to set alarm mask:%d\n", ret);
 		return ret;
 	}
+//#if 0
 	ret = bq2597x_set_fault_int_mask(bq,
 			TS_BUS_FAULT | TS_DIE_FAULT | TS_BAT_FAULT | BAT_OCP_FAULT);
 	if (ret) {
 		bq_err("failed to set fault mask:%d\n", ret);
 		return ret;
 	}
+//#endif
 	return ret;
 }
 
@@ -2141,7 +2152,6 @@ static int bq2597x_charger_get_property(struct power_supply *psy,
 		break;
 	case POWER_SUPPLY_PROP_CP_VBAT_CALIBRATE:
 		val->intval = bq->vbat_calibrate;
-		break;
 	default:
 		return -EINVAL;
 
@@ -2482,6 +2492,8 @@ static struct of_device_id bq2597x_charger_match_table[] = {
 	},
 	{},
 };
+//MODULE_DEVICE_TABLE(of, bq2597x_charger_match_table);
+
 
 static int bq2597x_charger_probe(struct i2c_client *client,
 					const struct i2c_device_id *id)
@@ -2580,6 +2592,7 @@ static int bq2597x_charger_probe(struct i2c_client *client,
 	}
 
 	determine_initial_status(bq);
+	/* schedule_delayed_work(&bq->monitor_work, 60 * HZ); */
 	bq_info("bq2597x probe successfully, Part Num = %d, chip_vendor = %d\n!", bq->part_no, bq->chip_vendor);
 
 	return 0;
@@ -2704,4 +2717,5 @@ module_i2c_driver(bq2597x_charger_driver);
 MODULE_DESCRIPTION("TI BQ2597x Charger Driver");
 MODULE_LICENSE("GPL v2");
 MODULE_AUTHOR("Texas Instruments");
+
 

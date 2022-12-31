@@ -551,3 +551,4 @@ int qg_get_ibat_avg(struct qpnp_qg *chip, int *ibat_ua)
 
 	return 0;
 }
+

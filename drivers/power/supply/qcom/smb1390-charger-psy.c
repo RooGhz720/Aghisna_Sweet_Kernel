@@ -2245,3 +2245,4 @@ module_platform_driver(smb1390_driver);
 
 MODULE_DESCRIPTION("SMB1390 Charge Pump Driver");
 MODULE_LICENSE("GPL v2");
+

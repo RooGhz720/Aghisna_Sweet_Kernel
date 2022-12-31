@@ -797,7 +797,9 @@
 #define SC8551_VBUS_ADC_LSB				3.75
 #define SC8551_VAC_ADC_LSB				5
 #define SC8551_VOUT_ADC_LSB				1.25
+
 #define SC8551_VBAT_ADC_LSB				(1.25*1.0044)
+
 #define SC8551_VBAT_ADC_LSB_NON_CALIBRATE		1.25
 #define SC8551_IBAT_ADC_LSB				3.125
 #define SC8551_TSBUS_ADC_LSB				1.0
@@ -820,3 +822,4 @@
 #define SC8551_ADC_OPTI					1
 
 #endif
+
